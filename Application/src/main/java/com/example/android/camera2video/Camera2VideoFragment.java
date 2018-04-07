@@ -47,6 +47,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -65,7 +66,9 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class Camera2VideoFragment extends Fragment
-        implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
+        implements View.OnClickListener,
+                   View.OnKeyListener,
+                   FragmentCompat.OnRequestPermissionsResultCallback {
 
     private static final int SENSOR_ORIENTATION_DEFAULT_DEGREES = 90;
     private static final int SENSOR_ORIENTATION_INVERSE_DEGREES = 270;
@@ -281,6 +284,10 @@ public class Camera2VideoFragment extends Fragment
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        mTextureView.setOnKeyListener(this);
+        //make sure we have focus to receive key events
+        mTextureView.setFocusableInTouchMode(true);
+        mTextureView.requestFocus();
         mButtonVideo = (Button) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
         view.findViewById(R.id.info).setOnClickListener(this);
@@ -325,6 +332,23 @@ public class Camera2VideoFragment extends Fragment
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    public boolean onKey(View view, int keycode, KeyEvent keyEvent) {
+        switch (keycode) {
+            case KeyEvent.KEYCODE_ENTER :
+                //key up only triggers once per press
+                if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                    Log.d(TAG, "ENTER Keycode Received");
+                    mButtonVideo.performClick();
+                }
+                return true;
+            //ignore vol up key that is also sent
+            case KeyEvent.KEYCODE_VOLUME_UP : return true;
+            //pass on all other key codes
+            default : return false;
         }
     }
 
