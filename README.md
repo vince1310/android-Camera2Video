@@ -16,18 +16,18 @@ an issue with the original Google sample and from whose project this one is dire
 
 Features Added to Original Google Sample:
 
-1. Control of video record start/stop from bluetooth remote ([#1][iss1])
-2. Video recording at device maximum framerate ([#4][iss4])
-3. Timer for recording start/end ([#2][iss2], [#3][iss3], [#5][iss5])
+1. Control of video record start/stop from bluetooth remote ([#1][4])
+2. Video recording at device maximum framerate ([#4][5])
+3. Timer for recording start/end ([#2][6], [#3][7], [#5][8])
 
 [1]: https://www.amazon.com/Bluetooth-Android-Foneso-Extendable-Aluminum/dp/B012AGH0KO
 [2]: https://github.com/googlesamples/android-Camera2Video
 [3]: https://github.com/skynetlabz
-[iss1] : https://github.com/vince1310/android-GolfVideoCamera/issues/1
-[iss2] : https://github.com/vince1310/android-GolfVideoCamera/issues/2
-[iss3] : https://github.com/vince1310/android-GolfVideoCamera/issues/3
-[iss4] : https://github.com/vince1310/android-GolfVideoCamera/issues/4
-[iss5] : https://github.com/vince1310/android-GolfVideoCamera/issues/5
+[4] : https://github.com/vince1310/android-GolfVideoCamera/issues/1
+[5] : https://github.com/vince1310/android-GolfVideoCamera/issues/4
+[6] : https://github.com/vince1310/android-GolfVideoCamera/issues/2
+[7] : https://github.com/vince1310/android-GolfVideoCamera/issues/3
+[8] : https://github.com/vince1310/android-GolfVideoCamera/issues/5
 
 Pre-requisites (needs update)
 --------------
