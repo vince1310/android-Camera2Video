@@ -23,11 +23,11 @@ Features Added to Original Google Sample:
 [1]: https://www.amazon.com/Bluetooth-Android-Foneso-Extendable-Aluminum/dp/B012AGH0KO
 [2]: https://github.com/googlesamples/android-Camera2Video
 [3]: https://github.com/skynetlabz
-[4] : https://github.com/vince1310/android-GolfVideoCamera/issues/1
-[5] : https://github.com/vince1310/android-GolfVideoCamera/issues/4
-[6] : https://github.com/vince1310/android-GolfVideoCamera/issues/2
-[7] : https://github.com/vince1310/android-GolfVideoCamera/issues/3
-[8] : https://github.com/vince1310/android-GolfVideoCamera/issues/5
+[4]: https://github.com/vince1310/android-GolfVideoCamera/issues/1
+[5]: https://github.com/vince1310/android-GolfVideoCamera/issues/4
+[6]: https://github.com/vince1310/android-GolfVideoCamera/issues/2
+[7]: https://github.com/vince1310/android-GolfVideoCamera/issues/3
+[8]: https://github.com/vince1310/android-GolfVideoCamera/issues/5
 
 Pre-requisites (needs update)
 --------------
