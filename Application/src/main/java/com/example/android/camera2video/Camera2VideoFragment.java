@@ -342,11 +342,7 @@ public class Camera2VideoFragment extends Fragment
                 //key up only triggers once per press
                 if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "ENTER Keycode Received");
-                    Activity activity = getActivity();
-                    if (null != activity) {
-                        Toast.makeText(activity, "ENTER Keycode Received!",
-                                Toast.LENGTH_SHORT).show();
-                    }
+                    mButtonVideo.performClick();
                 }
                 return true;
             //ignore vol up key that is also sent
