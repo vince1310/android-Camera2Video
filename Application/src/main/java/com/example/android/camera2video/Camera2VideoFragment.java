@@ -31,12 +31,14 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraConstrainedHighSpeedCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +48,7 @@ import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Size;
+import android.util.Range;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -158,6 +161,8 @@ public class Camera2VideoFragment extends Fragment
      * The {@link android.util.Size} of video recording.
      */
     private Size mVideoSize;
+
+    private Range<Integer>[] mVideoFps;
 
     /**
      * MediaRecorder
@@ -456,6 +461,12 @@ public class Camera2VideoFragment extends Fragment
 
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            //int[] avail = characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            Range<Integer>[] fpsRange = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            for (Range<Integer> fps : fpsRange) {
+                Log.d(TAG, "FPS: min " + fps.getLower() + ", max " + fps.getUpper());
+            }
+
             StreamConfigurationMap map = characteristics
                     .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
@@ -465,6 +476,7 @@ public class Camera2VideoFragment extends Fragment
             mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
+            //availableFpsRange = map.getHighSpeedVideoFpsRangesFor(chooseVideoSize(map.getHighSpeedVideoSizes()));
 
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -609,10 +621,24 @@ public class Camera2VideoFragment extends Fragment
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
             mNextVideoAbsolutePath = getVideoFilePath(getActivity());
         }
+
+        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
+        Log.d(TAG, "Quality: " + profile.quality);
+        Log.d(TAG, "Frame Rate: " + profile.videoFrameRate);
+
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
         mMediaRecorder.setVideoFrameRate(30);
+        try {
+            mMediaRecorder.setCaptureRate(30 / 0.25);
+            Log.d(TAG, "Capture rate set to 120 fps");
+        } catch (Exception e) {
+            mMediaRecorder.setCaptureRate(30);
+            Log.d(TAG, "Failed to up capture rate");
+        }
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
+        Log.d(TAG, "Video Size: " + mVideoSize.getWidth()+ "x" + mVideoSize.getHeight());
+        Log.d(TAG, "720 Size: " + profile.videoFrameWidth+ "x" + profile.videoFrameHeight);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -624,6 +650,7 @@ public class Camera2VideoFragment extends Fragment
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
                 break;
         }
+        //exception will be thrown here if capture rate is not allowed
         mMediaRecorder.prepare();
     }
 
