@@ -82,6 +82,9 @@ public class Camera2VideoFragment extends Fragment
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
 
+    private static final int BASE_FRAME_RATE = 30;
+    private static final int SLOMO_FRAME_RATE = 120;
+
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
@@ -461,7 +464,6 @@ public class Camera2VideoFragment extends Fragment
 
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            //int[] avail = characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
             Range<Integer>[] fpsRange = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
             for (Range<Integer> fps : fpsRange) {
                 Log.d(TAG, "FPS: min " + fps.getLower() + ", max " + fps.getUpper());
@@ -476,7 +478,6 @@ public class Camera2VideoFragment extends Fragment
             mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
-            //availableFpsRange = map.getHighSpeedVideoFpsRangesFor(chooseVideoSize(map.getHighSpeedVideoSizes()));
 
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -622,23 +623,12 @@ public class Camera2VideoFragment extends Fragment
             mNextVideoAbsolutePath = getVideoFilePath(getActivity());
         }
 
-        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
-        Log.d(TAG, "Quality: " + profile.quality);
-        Log.d(TAG, "Frame Rate: " + profile.videoFrameRate);
-
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
-        mMediaRecorder.setVideoFrameRate(30);
-        try {
-            mMediaRecorder.setCaptureRate(30 / 0.25);
-            Log.d(TAG, "Capture rate set to 120 fps");
-        } catch (Exception e) {
-            mMediaRecorder.setCaptureRate(30);
-            Log.d(TAG, "Failed to up capture rate");
-        }
+        mMediaRecorder.setVideoFrameRate(BASE_FRAME_RATE);
+        mMediaRecorder.setCaptureRate(SLOMO_FRAME_RATE);
+        Log.d(TAG, "Capture rate set to 120 fps");
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-        Log.d(TAG, "Video Size: " + mVideoSize.getWidth()+ "x" + mVideoSize.getHeight());
-        Log.d(TAG, "720 Size: " + profile.videoFrameWidth+ "x" + profile.videoFrameHeight);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -651,7 +641,13 @@ public class Camera2VideoFragment extends Fragment
                 break;
         }
         //exception will be thrown here if capture rate is not allowed
-        mMediaRecorder.prepare();
+        try {
+            mMediaRecorder.prepare();
+        } catch (Exception e) {
+            mMediaRecorder.setCaptureRate(BASE_FRAME_RATE);
+            Log.d(TAG, "Failed to up capture rate");
+            mMediaRecorder.prepare();
+        }
     }
 
     private String getVideoFilePath(Context context) {
