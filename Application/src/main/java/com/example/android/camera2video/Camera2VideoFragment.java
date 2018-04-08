@@ -46,6 +46,7 @@ import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.Size;
+import android.util.Range;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -78,6 +79,9 @@ public class Camera2VideoFragment extends Fragment
     private static final String TAG = "Camera2VideoFragment";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
+
+    private static final int BASE_FRAME_RATE = 30;
+    private static final int SLOMO_FRAME_RATE = 120;
 
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
@@ -456,6 +460,11 @@ public class Camera2VideoFragment extends Fragment
 
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            Range<Integer>[] fpsRange = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            for (Range<Integer> fps : fpsRange) {
+                Log.d(TAG, "FPS: min " + fps.getLower() + ", max " + fps.getUpper());
+            }
+
             StreamConfigurationMap map = characteristics
                     .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
@@ -609,9 +618,12 @@ public class Camera2VideoFragment extends Fragment
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
             mNextVideoAbsolutePath = getVideoFilePath(getActivity());
         }
+
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
-        mMediaRecorder.setVideoFrameRate(30);
+        mMediaRecorder.setVideoFrameRate(BASE_FRAME_RATE);
+        mMediaRecorder.setCaptureRate(SLOMO_FRAME_RATE);
+        Log.d(TAG, "Capture rate set to 120 fps");
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
@@ -624,7 +636,14 @@ public class Camera2VideoFragment extends Fragment
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
                 break;
         }
-        mMediaRecorder.prepare();
+        //exception will be thrown here if capture rate is not allowed
+        try {
+            mMediaRecorder.prepare();
+        } catch (Exception e) {
+            mMediaRecorder.setCaptureRate(BASE_FRAME_RATE);
+            Log.d(TAG, "Failed to up capture rate");
+            mMediaRecorder.prepare();
+        }
     }
 
     private String getVideoFilePath(Context context) {
