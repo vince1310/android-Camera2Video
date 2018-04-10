@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -48,6 +49,7 @@ import android.util.Log;
 import android.util.Size;
 import android.util.Range;
 import android.util.SparseIntArray;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -55,6 +57,9 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextClock;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -226,6 +231,27 @@ public class Camera2VideoFragment extends Fragment
     private String mNextVideoAbsolutePath;
     private CaptureRequest.Builder mPreviewBuilder;
 
+    private Boolean mCancelTimer = false;
+    private Integer mTimerCount = 1;
+    private Handler mTimerHandler = new Handler();
+    private TextView mCountdown;
+
+    private Runnable mCameraTimer = new Runnable() {
+        public void run()
+        {
+            if (!mCancelTimer) {
+                mTimerCount = mTimerCount - 1;
+                if (mTimerCount == 0) { startRecordingVideo(); }
+                else {
+                    //set button number
+                    mCountdown.setText(mTimerCount.toString());
+                    //requeue timer tick
+                    mTimerHandler.postDelayed(mCameraTimer, 1000);
+                }
+            }
+        }
+    };
+
     public static Camera2VideoFragment newInstance() {
         return new Camera2VideoFragment();
     }
@@ -282,7 +308,17 @@ public class Camera2VideoFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera2_video, container, false);
+        View mainView = inflater.inflate(R.layout.fragment_camera2_video, container, false);
+
+        LinearLayout overlay = (LinearLayout) mainView.findViewById(R.id.overlay);
+        mCountdown = new TextView(this.getActivity());
+        mCountdown.setText("Ready?");
+        mCountdown.setTextSize(90);
+        mCountdown.setGravity(Gravity.CENTER);
+        overlay.addView(mCountdown);
+        overlay.setBackgroundColor(Color.TRANSPARENT);
+
+        return mainView;
     }
 
     @Override
@@ -320,9 +356,14 @@ public class Camera2VideoFragment extends Fragment
         switch (view.getId()) {
             case R.id.video: {
                 if (mIsRecordingVideo) {
+                    mCancelTimer = true;
                     stopRecordingVideo();
                 } else {
-                    startRecordingVideo();
+                    //startRecordingVideo();
+                    mCancelTimer = false;
+                    mTimerCount = 5;
+                    mCountdown.setText(mTimerCount.toString());
+                    mTimerHandler.postDelayed(mCameraTimer, 1000);
                 }
                 break;
             }
@@ -657,6 +698,7 @@ public class Camera2VideoFragment extends Fragment
             return;
         }
         try {
+            mCountdown.setText("");
             closePreviewSession();
             setUpMediaRecorder();
             SurfaceTexture texture = mTextureView.getSurfaceTexture();
@@ -721,6 +763,7 @@ public class Camera2VideoFragment extends Fragment
         // UI
         mIsRecordingVideo = false;
         mButtonVideo.setText(R.string.record);
+        mCountdown.setText("Ready?");
 
         //Added by @skynetlabz to resolve exception issue when stop recording.
         try {
