@@ -38,6 +38,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.icu.text.AlphabeticIndex;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -176,7 +177,8 @@ public class Camera2VideoFragment extends Fragment
     /**
      * Whether the app is recording video now
      */
-    private boolean mIsRecordingVideo;
+    private enum RecordState {Idle, Recording, Counting}
+    private RecordState mRecordState = RecordState.Idle;
 
     /**
      * An additional thread for running tasks that shouldn't block the UI.
@@ -309,15 +311,8 @@ public class Camera2VideoFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View mainView = inflater.inflate(R.layout.fragment_camera2_video, container, false);
-
-        LinearLayout overlay = (LinearLayout) mainView.findViewById(R.id.overlay);
-        mCountdown = new TextView(this.getActivity());
-        mCountdown.setText("Ready?");
-        mCountdown.setTextSize(90);
-        mCountdown.setGravity(Gravity.CENTER);
-        overlay.addView(mCountdown);
-        overlay.setBackgroundColor(Color.TRANSPARENT);
-
+        mCountdown = (TextView) mainView.findViewById(R.id.overlay);
+        mCountdown.setText(R.string.count_default);
         return mainView;
     }
 
@@ -355,15 +350,27 @@ public class Camera2VideoFragment extends Fragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.video: {
-                if (mIsRecordingVideo) {
-                    mCancelTimer = true;
-                    stopRecordingVideo();
-                } else {
-                    //startRecordingVideo();
-                    mCancelTimer = false;
-                    mTimerCount = 5;
-                    mCountdown.setText(mTimerCount.toString());
-                    mTimerHandler.postDelayed(mCameraTimer, 1000);
+                switch(mRecordState) {
+                    case Recording: {
+                        mCancelTimer = true;
+                        stopRecordingVideo();
+                        break;
+                    }
+                    case Idle: {
+                        mRecordState = RecordState.Counting;
+                        mButtonVideo.setText(R.string.armed);
+                        mCancelTimer = false;
+                        mTimerCount = 5;
+                        mCountdown.setText(mTimerCount.toString());
+                        mTimerHandler.postDelayed(mCameraTimer, 1000);
+                        break;
+                    }
+                    case Counting: {
+                        mCancelTimer = true;
+                        mCountdown.setText(R.string.count_default);
+                        mRecordState = RecordState.Idle;
+                        mButtonVideo.setText(R.string.record);
+                    }
                 }
                 break;
             }
@@ -730,7 +737,7 @@ public class Camera2VideoFragment extends Fragment
                         public void run() {
                             // UI
                             mButtonVideo.setText(R.string.stop);
-                            mIsRecordingVideo = true;
+                            mRecordState = RecordState.Recording;
 
                             // Start recording
                             mMediaRecorder.start();
@@ -761,9 +768,9 @@ public class Camera2VideoFragment extends Fragment
 
     private void stopRecordingVideo() {
         // UI
-        mIsRecordingVideo = false;
+        mRecordState = RecordState.Idle;
         mButtonVideo.setText(R.string.record);
-        mCountdown.setText("Ready?");
+        mCountdown.setText(R.string.count_default);
 
         //Added by @skynetlabz to resolve exception issue when stop recording.
         try {
