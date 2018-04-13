@@ -18,13 +18,18 @@ package com.example.android.camera2video;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
-public class CameraActivity extends Activity {
+public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
         if (null == savedInstanceState) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.container, Camera2VideoFragment.newInstance())
@@ -32,4 +37,9 @@ public class CameraActivity extends Activity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
 }

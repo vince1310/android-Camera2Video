@@ -45,7 +45,7 @@
         android:layout_alignParentTop="true"
         android:layout_below="@id/texture"
         android:layout_toRightOf="@id/texture"
-        android:background="#4285f4"
+        android:background="@color/bars"
         android:orientation="horizontal">
 
         <Button
