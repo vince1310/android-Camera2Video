@@ -89,6 +89,9 @@ public class Camera2VideoFragment extends Fragment
     private static final int BASE_FRAME_RATE = 30;
     private static final int SLOMO_FRAME_RATE = 120;
 
+    private static final int VIDEO_RECORD_LENGTH = 6000; //ms
+    private static final int COUNTDOWN_LENGTH = 3; //sec
+
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
@@ -233,23 +236,37 @@ public class Camera2VideoFragment extends Fragment
     private String mNextVideoAbsolutePath;
     private CaptureRequest.Builder mPreviewBuilder;
 
-    private Boolean mCancelTimer = false;
+    /**
+     * A {@link Handler} for running automatically stopping recording.
+     */
+    private Handler mAutoStopHandler = new Handler();
+
+    /**
+     * Count of seconds left until recording beings.
+     */
     private Integer mTimerCount = 1;
+    /**
+     * A {@link Handler} for running automatically starting recording.
+     */
     private Handler mTimerHandler = new Handler();
+    /**
+     * A {@Link TextView} for displaying the countdown timer.
+     */
     private TextView mCountdown;
 
+    /**
+     * A {@Link Runnable} that executes a tick of the countdown timer.
+     */
     private Runnable mCameraTimer = new Runnable() {
         public void run()
         {
-            if (!mCancelTimer) {
-                mTimerCount = mTimerCount - 1;
-                if (mTimerCount == 0) { startRecordingVideo(); }
-                else {
-                    //set button number
-                    mCountdown.setText(mTimerCount.toString());
-                    //requeue timer tick
-                    mTimerHandler.postDelayed(mCameraTimer, 1000);
-                }
+            mTimerCount = mTimerCount - 1;
+            if (mTimerCount == 0) { startRecordingVideo(); }
+            else {
+                //set button number
+                mCountdown.setText(mTimerCount.toString());
+                //requeue timer tick
+                mTimerHandler.postDelayed(mCameraTimer, 1000);
             }
         }
     };
@@ -352,24 +369,16 @@ public class Camera2VideoFragment extends Fragment
             case R.id.video: {
                 switch(mRecordState) {
                     case Recording: {
-                        mCancelTimer = true;
                         stopRecordingVideo();
                         break;
                     }
                     case Idle: {
-                        mRecordState = RecordState.Counting;
-                        mButtonVideo.setText(R.string.armed);
-                        mCancelTimer = false;
-                        mTimerCount = 5;
-                        mCountdown.setText(mTimerCount.toString());
-                        mTimerHandler.postDelayed(mCameraTimer, 1000);
+                        startCounting();
                         break;
                     }
                     case Counting: {
-                        mCancelTimer = true;
-                        mCountdown.setText(R.string.count_default);
-                        mRecordState = RecordState.Idle;
-                        mButtonVideo.setText(R.string.record);
+                        abortCounting();
+                        break;
                     }
                 }
                 break;
@@ -700,6 +709,21 @@ public class Camera2VideoFragment extends Fragment
                 + System.currentTimeMillis() + ".mp4";
     }
 
+    private void startCounting() {
+        mRecordState = RecordState.Counting;
+        mButtonVideo.setText(R.string.armed);
+        mTimerCount = COUNTDOWN_LENGTH;
+        mCountdown.setText(mTimerCount.toString());
+        mTimerHandler.postDelayed(mCameraTimer, 1000);
+    }
+
+    private void abortCounting() {
+        mTimerHandler.removeCallbacks(mCameraTimer);
+        mCountdown.setText(R.string.count_default);
+        mRecordState = RecordState.Idle;
+        mButtonVideo.setText(R.string.record);
+    }
+
     private void startRecordingVideo() {
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
@@ -741,6 +765,13 @@ public class Camera2VideoFragment extends Fragment
 
                             // Start recording
                             mMediaRecorder.start();
+                            // Auto stop timer
+                            mAutoStopHandler.postDelayed(
+                                    new Runnable() {
+                                        public void run() {
+                                            if (mRecordState == RecordState.Recording)
+                                            { stopRecordingVideo();} } },
+                                    VIDEO_RECORD_LENGTH);
                         }
                     });
                 }
@@ -771,6 +802,7 @@ public class Camera2VideoFragment extends Fragment
         mRecordState = RecordState.Idle;
         mButtonVideo.setText(R.string.record);
         mCountdown.setText(R.string.count_default);
+        mTimerHandler.removeCallbacks(mCameraTimer);
 
         //Added by @skynetlabz to resolve exception issue when stop recording.
         try {
