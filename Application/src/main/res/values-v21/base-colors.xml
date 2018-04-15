@@ -16,6 +16,5 @@
 -->
 
 <resources>
-
-
+    <color name="bars">#4285f4</color>
 </resources>

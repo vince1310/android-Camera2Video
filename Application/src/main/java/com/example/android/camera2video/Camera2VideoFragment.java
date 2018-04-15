@@ -58,6 +58,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
 import android.widget.TextView;
@@ -119,7 +120,7 @@ public class Camera2VideoFragment extends Fragment
     /**
      * Button to record video
      */
-    private Button mButtonVideo;
+    private ImageButton mButtonVideo;
 
     /**
      * A reference to the opened {@link android.hardware.camera2.CameraDevice}.
@@ -340,9 +341,8 @@ public class Camera2VideoFragment extends Fragment
         //make sure we have focus to receive key events
         mTextureView.setFocusableInTouchMode(true);
         mTextureView.requestFocus();
-        mButtonVideo = (Button) view.findViewById(R.id.video);
+        mButtonVideo = (ImageButton) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
     }
 
     @Override
@@ -380,16 +380,6 @@ public class Camera2VideoFragment extends Fragment
                         abortCounting();
                         break;
                     }
-                }
-                break;
-            }
-            case R.id.info: {
-                Activity activity = getActivity();
-                if (null != activity) {
-                    new AlertDialog.Builder(activity)
-                            .setMessage(R.string.intro_message)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
                 }
                 break;
             }
@@ -711,7 +701,7 @@ public class Camera2VideoFragment extends Fragment
 
     private void startCounting() {
         mRecordState = RecordState.Counting;
-        mButtonVideo.setText(R.string.armed);
+        mButtonVideo.setImageResource(R.drawable.ic_videocam_off_white_48dp);
         mTimerCount = COUNTDOWN_LENGTH;
         mCountdown.setText(mTimerCount.toString());
         mTimerHandler.postDelayed(mCameraTimer, 1000);
@@ -721,7 +711,7 @@ public class Camera2VideoFragment extends Fragment
         mTimerHandler.removeCallbacks(mCameraTimer);
         mCountdown.setText(R.string.count_default);
         mRecordState = RecordState.Idle;
-        mButtonVideo.setText(R.string.record);
+        mButtonVideo.setImageResource(R.drawable.ic_videocam_white_48dp);
     }
 
     private void startRecordingVideo() {
@@ -760,7 +750,7 @@ public class Camera2VideoFragment extends Fragment
                         @Override
                         public void run() {
                             // UI
-                            mButtonVideo.setText(R.string.stop);
+                            mButtonVideo.setImageResource(R.drawable.ic_stop_white_48dp);
                             mRecordState = RecordState.Recording;
 
                             // Start recording
@@ -800,7 +790,7 @@ public class Camera2VideoFragment extends Fragment
     private void stopRecordingVideo() {
         // UI
         mRecordState = RecordState.Idle;
-        mButtonVideo.setText(R.string.record);
+        mButtonVideo.setImageResource(R.drawable.ic_videocam_white_48dp);
         mCountdown.setText(R.string.count_default);
         mTimerHandler.removeCallbacks(mCameraTimer);
 
