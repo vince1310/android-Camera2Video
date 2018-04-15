@@ -17,12 +17,18 @@
 package com.example.android.camera2video;
 
 import android.app.Activity;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 public class CameraActivity extends AppCompatActivity {
+
+    private static final String TAG = "CameraActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,5 +47,18 @@ public class CameraActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Toast.makeText(this, "Sorry, settings are not implemented at this time",
+                        Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Settings Menu invoked.");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
