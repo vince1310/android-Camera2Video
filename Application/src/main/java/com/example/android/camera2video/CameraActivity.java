@@ -17,6 +17,7 @@
 package com.example.android.camera2video;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -53,9 +54,11 @@ public class CameraActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Toast.makeText(this, "Sorry, settings are not implemented at this time",
-                        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Sorry, settings are not implemented at this time",
+                //        Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Settings Menu invoked.");
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
