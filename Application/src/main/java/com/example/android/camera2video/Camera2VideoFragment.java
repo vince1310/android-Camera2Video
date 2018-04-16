@@ -704,6 +704,7 @@ public class Camera2VideoFragment extends Fragment
         mButtonVideo.setImageResource(R.drawable.ic_videocam_off_white_48dp);
         mTimerCount = COUNTDOWN_LENGTH;
         mCountdown.setText(mTimerCount.toString());
+        Log.d(TAG, "Counting from " + mTimerCount.toString());
         mTimerHandler.postDelayed(mCameraTimer, 1000);
     }
 
