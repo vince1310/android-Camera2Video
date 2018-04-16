@@ -6,6 +6,9 @@ import android.support.v7.widget.Toolbar;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    public static final String KEY_PREF_COUNTDOWN = "option_countdown";
+    public static final String KEY_PREF_FIXED_LENGTH = "option_fixed";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

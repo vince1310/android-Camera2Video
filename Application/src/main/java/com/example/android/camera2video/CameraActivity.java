@@ -18,9 +18,11 @@ package com.example.android.camera2video;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -42,6 +44,7 @@ public class CameraActivity extends AppCompatActivity {
                     .replace(R.id.container, Camera2VideoFragment.newInstance())
                     .commit();
         }
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     @Override
@@ -54,8 +57,6 @@ public class CameraActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //Toast.makeText(this, "Sorry, settings are not implemented at this time",
-                //        Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Settings Menu invoked.");
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);

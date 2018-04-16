@@ -24,6 +24,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -111,6 +112,10 @@ public class Camera2VideoFragment extends Fragment
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_180, 90);
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_270, 0);
     }
+
+    //settings
+    private static Boolean opt_USE_COUNTDOWN = false;
+    private static Boolean opt_USE_FIXED_LENGTH = false;
 
     /**
      * An {@link AutoFitTextureView} for camera preview.
@@ -343,6 +348,14 @@ public class Camera2VideoFragment extends Fragment
         mTextureView.requestFocus();
         mButtonVideo = (ImageButton) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
+
+        //get settings
+        SharedPreferences sharedPref = android.support.v7.preference.
+                PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        opt_USE_COUNTDOWN = sharedPref.getBoolean(SettingsActivity.KEY_PREF_COUNTDOWN, false);
+        opt_USE_FIXED_LENGTH = sharedPref.getBoolean(SettingsActivity.KEY_PREF_FIXED_LENGTH, false);
+        Log.d(TAG, "Settings: countdown=" + opt_USE_COUNTDOWN.toString() +
+                        ", fixed=" + opt_USE_FIXED_LENGTH.toString());
     }
 
     @Override
@@ -373,7 +386,8 @@ public class Camera2VideoFragment extends Fragment
                         break;
                     }
                     case Idle: {
-                        startCounting();
+                        if (opt_USE_COUNTDOWN) { startCounting(); }
+                        else { startRecordingVideo(); }
                         break;
                     }
                     case Counting: {
@@ -757,12 +771,17 @@ public class Camera2VideoFragment extends Fragment
                             // Start recording
                             mMediaRecorder.start();
                             // Auto stop timer
-                            mAutoStopHandler.postDelayed(
-                                    new Runnable() {
-                                        public void run() {
-                                            if (mRecordState == RecordState.Recording)
-                                            { stopRecordingVideo();} } },
-                                    VIDEO_RECORD_LENGTH);
+                            if (opt_USE_FIXED_LENGTH) {
+                                mAutoStopHandler.postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+                                                if (mRecordState == RecordState.Recording) {
+                                                    stopRecordingVideo();
+                                                }
+                                            }
+                                        },
+                                        VIDEO_RECORD_LENGTH);
+                            }
                         }
                     });
                 }
