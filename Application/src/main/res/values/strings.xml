@@ -7,8 +7,12 @@
     <string name="description_info">Info</string>
     <string name="opt_countdown_title">Recording Timer</string>
     <string name="opt_countdown_des">Use delay timer to start recording</string>
+    <string name="opt_countdown_val_title">Delay Time</string>
+    <string name="opt_countdown_val_des">Number of seconds for delay timer</string>
     <string name="opt_fixed_title">Fixed Length Recording</string>
-    <string name="opt_fixed_des">Use fixed length for recording</string>
+    <string name="opt_fixed_des">Use fixed time for recording length</string>
+    <string name="opt_fixed_val_title">Recording Time</string>
+    <string name="opt_fixed_val_des">Number of seconds to record</string>
     <string name="permission_request">This sample needs permission for camera and audio recording.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
 

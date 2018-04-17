@@ -91,9 +91,6 @@ public class Camera2VideoFragment extends Fragment
     private static final int BASE_FRAME_RATE = 30;
     private static final int SLOMO_FRAME_RATE = 120;
 
-    private static final int VIDEO_RECORD_LENGTH = 6000; //ms
-    private static final int COUNTDOWN_LENGTH = 3; //sec
-
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
@@ -115,7 +112,9 @@ public class Camera2VideoFragment extends Fragment
 
     //settings
     private static Boolean opt_USE_COUNTDOWN = false;
+    private static Integer opt_VAL_COUNTDOWN = 3;
     private static Boolean opt_USE_FIXED_LENGTH = false;
+    private static Integer opt_VAL_FIXED_LENGTH = 6;
 
     /**
      * An {@link AutoFitTextureView} for camera preview.
@@ -353,9 +352,13 @@ public class Camera2VideoFragment extends Fragment
         SharedPreferences sharedPref = android.support.v7.preference.
                 PreferenceManager.getDefaultSharedPreferences(this.getActivity());
         opt_USE_COUNTDOWN = sharedPref.getBoolean(SettingsActivity.KEY_PREF_COUNTDOWN, false);
+        opt_VAL_COUNTDOWN = sharedPref.getInt(SettingsActivity.KEY_PREF_COUNTDOWN_VAL, 3);
         opt_USE_FIXED_LENGTH = sharedPref.getBoolean(SettingsActivity.KEY_PREF_FIXED_LENGTH, false);
+        opt_VAL_FIXED_LENGTH = sharedPref.getInt(SettingsActivity.KEY_PREF_FIXED_LENGTH_VAL, 6);
         Log.d(TAG, "Settings: countdown=" + opt_USE_COUNTDOWN.toString() +
-                        ", fixed=" + opt_USE_FIXED_LENGTH.toString());
+                        ", time=" + opt_VAL_COUNTDOWN.toString() +
+                        ", fixed=" + opt_USE_FIXED_LENGTH.toString() +
+                        ", time=" + opt_VAL_FIXED_LENGTH.toString());
     }
 
     @Override
@@ -716,7 +719,7 @@ public class Camera2VideoFragment extends Fragment
     private void startCounting() {
         mRecordState = RecordState.Counting;
         mButtonVideo.setImageResource(R.drawable.ic_videocam_off_white_48dp);
-        mTimerCount = COUNTDOWN_LENGTH;
+        mTimerCount = opt_VAL_COUNTDOWN;
         mCountdown.setText(mTimerCount.toString());
         Log.d(TAG, "Counting from " + mTimerCount.toString());
         mTimerHandler.postDelayed(mCameraTimer, 1000);
@@ -780,7 +783,7 @@ public class Camera2VideoFragment extends Fragment
                                                 }
                                             }
                                         },
-                                        VIDEO_RECORD_LENGTH);
+                                        opt_VAL_FIXED_LENGTH * 1000);
                             }
                         }
                     });
