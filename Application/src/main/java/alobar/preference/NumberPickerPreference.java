@@ -1,3 +1,6 @@
+/**
+ * Created by Alobar (https://github.com/Alobar/AndroidPreferenceTest)
+ */
 package alobar.preference;
 
 import android.content.Context;
