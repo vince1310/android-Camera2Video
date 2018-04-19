@@ -255,6 +255,10 @@ public class Camera2VideoFragment extends Fragment
      */
     private Handler mTimerHandler = new Handler();
     /**
+     * A {@link Handler} for ansynchronously controlling the camera flash.
+     */
+    private Handler mFlashHandler = new Handler();
+    /**
      * A {@Link TextView} for displaying the countdown timer.
      */
     private TextView mCountdown;
@@ -266,14 +270,39 @@ public class Camera2VideoFragment extends Fragment
         public void run()
         {
             mTimerCount = mTimerCount - 1;
-            if (mTimerCount == 0) { startRecordingVideo(); }
+            if (mTimerCount == 0) {
+                mBlinkFlash.run();
+                startRecordingVideo();
+            }
             else {
+                //mFlashHandler.postDelayed(mBlinkFlash, 0);
                 //set button number
                 mCountdown.setText(mTimerCount.toString());
+                mBlinkFlash.run();
                 //requeue timer tick
-                mTimerHandler.postDelayed(mCameraTimer, 1000);
+                mTimerHandler.postDelayed(mCameraTimer, 900);
             }
         }
+    };
+
+    private Runnable mBlinkFlash = new Runnable() {
+        public void run()
+        {
+            try {
+                mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, null);
+                Thread.sleep(100);
+                mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+                mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, null);
+            }
+            catch (InterruptedException e){
+                throw new RuntimeException("Interrupted while blinking camera flash.");
+            }
+            catch (CameraAccessException e){
+                Log.d(TAG, "Error accessing the camera to set the flash.");
+            }
+        }
+
     };
 
     public static Camera2VideoFragment newInstance() {
