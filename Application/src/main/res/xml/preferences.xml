@@ -2,33 +2,45 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:preference="http://schemas.android.com/apk/res-auto">
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="option_countdown"
-        android:summary="@string/opt_countdown_des"
-        android:title="@string/opt_countdown_title" />
-    <alobar.preference.NumberPickerPreference
-        android:defaultValue="3"
-        android:key="option_countdown_val"
-        android:title="@string/opt_countdown_val_title"
-        android:summary="@string/opt_countdown_val_des"
-        preference:maxValue="15"
-        preference:minValue="1"
-        preference:wrapSelectorWheel="false"
-        android:dependency="option_countdown"/>
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="option_fixed"
-        android:summary="@string/opt_fixed_des"
-        android:title="@string/opt_fixed_title" />
-    <alobar.preference.NumberPickerPreference
-        android:defaultValue="6"
-        android:key="option_fixed_val"
-        android:title="@string/opt_fixed_val_title"
-        android:summary="@string/opt_fixed_val_des"
-        preference:maxValue="60"
-        preference:minValue="5"
-        preference:wrapSelectorWheel="false"
-        android:dependency="option_fixed"/>
+    <PreferenceCategory
+        android:title="@string/opt_countdown_cat">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="option_countdown"
+            android:summary="@string/opt_countdown_des"
+            android:title="@string/opt_countdown_title" />
+        <alobar.preference.NumberPickerPreference
+            android:defaultValue="3"
+            android:key="option_countdown_val"
+            android:title="@string/opt_countdown_val_title"
+            android:summary="@string/opt_countdown_val_des"
+            preference:maxValue="15"
+            preference:minValue="1"
+            preference:wrapSelectorWheel="false"
+            android:dependency="option_countdown"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="option_countdown_flash"
+            android:title="@string/opt_countdown_flash_title"
+            android:summary="@string/opt_countdown_flash_des"
+            android:dependency="option_countdown"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/opt_fixed_cat">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="option_fixed"
+            android:summary="@string/opt_fixed_des"
+            android:title="@string/opt_fixed_title" />
+        <alobar.preference.NumberPickerPreference
+            android:defaultValue="6"
+            android:key="option_fixed_val"
+            android:title="@string/opt_fixed_val_title"
+            android:summary="@string/opt_fixed_val_des"
+            preference:maxValue="60"
+            preference:minValue="5"
+            preference:wrapSelectorWheel="false"
+            android:dependency="option_fixed"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>

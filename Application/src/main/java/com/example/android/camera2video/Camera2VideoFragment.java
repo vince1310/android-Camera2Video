@@ -113,6 +113,7 @@ public class Camera2VideoFragment extends Fragment
     //settings
     private static Boolean opt_USE_COUNTDOWN = false;
     private static Integer opt_VAL_COUNTDOWN = 3;
+    private static Boolean opt_USE_COUNTDOWN_FLASH = false;
     private static Boolean opt_USE_FIXED_LENGTH = false;
     private static Integer opt_VAL_FIXED_LENGTH = 6;
 
@@ -255,6 +256,10 @@ public class Camera2VideoFragment extends Fragment
      */
     private Handler mTimerHandler = new Handler();
     /**
+     * A {@link Handler} for ansynchronously controlling the camera flash.
+     */
+    private Handler mFlashHandler = new Handler();
+    /**
      * A {@Link TextView} for displaying the countdown timer.
      */
     private TextView mCountdown;
@@ -266,14 +271,38 @@ public class Camera2VideoFragment extends Fragment
         public void run()
         {
             mTimerCount = mTimerCount - 1;
-            if (mTimerCount == 0) { startRecordingVideo(); }
+            if (mTimerCount == 0) {
+                if (opt_USE_COUNTDOWN_FLASH) { mBlinkFlash.run(); }
+                startRecordingVideo();
+            }
             else {
+                if (opt_USE_COUNTDOWN_FLASH) { mFlashHandler.post(mBlinkFlash); }
                 //set button number
                 mCountdown.setText(mTimerCount.toString());
                 //requeue timer tick
                 mTimerHandler.postDelayed(mCameraTimer, 1000);
             }
         }
+    };
+
+    private Runnable mBlinkFlash = new Runnable() {
+        public void run()
+        {
+            try {
+                mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, null);
+                Thread.sleep(75);
+                mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+                mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, null);
+            }
+            catch (InterruptedException e){
+                throw new RuntimeException("Interrupted while blinking camera flash.");
+            }
+            catch (CameraAccessException e){
+                Log.d(TAG, "Error accessing the camera to set the flash.");
+            }
+        }
+
     };
 
     public static Camera2VideoFragment newInstance() {
@@ -353,10 +382,12 @@ public class Camera2VideoFragment extends Fragment
                 PreferenceManager.getDefaultSharedPreferences(this.getActivity());
         opt_USE_COUNTDOWN = sharedPref.getBoolean(SettingsActivity.KEY_PREF_COUNTDOWN, false);
         opt_VAL_COUNTDOWN = sharedPref.getInt(SettingsActivity.KEY_PREF_COUNTDOWN_VAL, 3);
+        opt_USE_COUNTDOWN_FLASH = sharedPref.getBoolean(SettingsActivity.KEY_PREF_COUNTDOWN_FLASH, false);
         opt_USE_FIXED_LENGTH = sharedPref.getBoolean(SettingsActivity.KEY_PREF_FIXED_LENGTH, false);
         opt_VAL_FIXED_LENGTH = sharedPref.getInt(SettingsActivity.KEY_PREF_FIXED_LENGTH_VAL, 6);
         Log.d(TAG, "Settings: countdown=" + opt_USE_COUNTDOWN.toString() +
                         ", time=" + opt_VAL_COUNTDOWN.toString() +
+                        ", flash=" + opt_USE_COUNTDOWN_FLASH.toString() +
                         ", fixed=" + opt_USE_FIXED_LENGTH.toString() +
                         ", time=" + opt_VAL_FIXED_LENGTH.toString());
     }
@@ -524,11 +555,6 @@ public class Camera2VideoFragment extends Fragment
 
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            Range<Integer>[] fpsRange = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
-            for (Range<Integer> fps : fpsRange) {
-                Log.d(TAG, "FPS: min " + fps.getLower() + ", max " + fps.getUpper());
-            }
-
             StreamConfigurationMap map = characteristics
                     .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
@@ -720,6 +746,7 @@ public class Camera2VideoFragment extends Fragment
         mRecordState = RecordState.Counting;
         mButtonVideo.setImageResource(R.drawable.ic_videocam_off_white_48dp);
         mTimerCount = opt_VAL_COUNTDOWN;
+        if (opt_USE_COUNTDOWN_FLASH) { mFlashHandler.post(mBlinkFlash); }
         mCountdown.setText(mTimerCount.toString());
         Log.d(TAG, "Counting from " + mTimerCount.toString());
         mTimerHandler.postDelayed(mCameraTimer, 1000);
