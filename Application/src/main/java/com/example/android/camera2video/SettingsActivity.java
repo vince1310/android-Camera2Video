@@ -8,6 +8,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static final String KEY_PREF_COUNTDOWN = "option_countdown";
     public static final String KEY_PREF_COUNTDOWN_VAL = "option_countdown_val";
+    public static final String KEY_PREF_COUNTDOWN_FLASH = "option_countdown_flash";
     public static final String KEY_PREF_FIXED_LENGTH = "option_fixed";
     public static final String KEY_PREF_FIXED_LENGTH_VAL = "option_fixed_val";
 

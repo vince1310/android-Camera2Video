@@ -5,10 +5,14 @@
     <string name="armed">Abort</string>
     <string name="count_default">+</string>
     <string name="description_info">Info</string>
+    <string name="opt_countdown_cat">Timer</string>
     <string name="opt_countdown_title">Recording Timer</string>
     <string name="opt_countdown_des">Use delay timer to start recording</string>
     <string name="opt_countdown_val_title">Delay Time</string>
     <string name="opt_countdown_val_des">Number of seconds for delay timer</string>
+    <string name="opt_countdown_flash_title">Flash Indicator</string>
+    <string name="opt_countdown_flash_des">Indicate countdown with camera flash</string>
+    <string name="opt_fixed_cat">Recording Length</string>
     <string name="opt_fixed_title">Fixed Length Recording</string>
     <string name="opt_fixed_des">Use fixed time for recording length</string>
     <string name="opt_fixed_val_title">Recording Time</string>
