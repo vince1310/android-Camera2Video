@@ -17,5 +17,6 @@
     <string name="opt_fixed_val_title">Recording Time</string>
     <string name="opt_fixed_val_des">Number of seconds to record</string>
     <string name="permission_request">This sample needs permission for camera and audio recording.</string>
+    <string name="open_error">Could not find compatible File Manager on device.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
 </resources>
