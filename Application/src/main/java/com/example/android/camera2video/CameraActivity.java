@@ -16,10 +16,9 @@
 
 package com.example.android.camera2video;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.nfc.Tag;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -28,6 +27,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import java.io.File;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -60,6 +61,16 @@ public class CameraActivity extends AppCompatActivity {
                 Log.d(TAG, "Settings Menu invoked.");
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.action_browse:
+                Log.d(TAG, "View Videos Menu invoked.");
+                Intent open_intent = new Intent(Intent.ACTION_VIEW);
+                open_intent.setDataAndType(Uri.fromFile(this.getExternalFilesDir(null)),"resource/folder");
+                if (open_intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(open_intent);
+                } else {
+                    Toast.makeText(this, R.string.open_error, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
