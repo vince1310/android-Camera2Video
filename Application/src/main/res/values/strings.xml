@@ -4,7 +4,6 @@
     <string name="stop">Stop</string>
     <string name="armed">Abort</string>
     <string name="count_default">+</string>
-    <string name="description_info">Info</string>
     <string name="opt_countdown_cat">Timer</string>
     <string name="opt_countdown_title">Recording Timer</string>
     <string name="opt_countdown_des">Use delay timer to start recording</string>
@@ -19,7 +18,4 @@
     <string name="opt_fixed_val_des">Number of seconds to record</string>
     <string name="permission_request">This sample needs permission for camera and audio recording.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
