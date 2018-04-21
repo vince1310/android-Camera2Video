@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.NumberPicker;
 
-import com.example.android.camera2video.R;
+import com.vangogh.studios.golfvideocamera.R;
 
 /**
  * A {@link android.preference.Preference} that displays a number picker as a dialog.

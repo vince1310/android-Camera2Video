@@ -1,4 +1,4 @@
-package com.example.android.camera2video;
+package com.vangogh.studios.golfvideocamera;
 
 
 import android.os.Bundle;

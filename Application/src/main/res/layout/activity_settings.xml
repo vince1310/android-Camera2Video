@@ -17,5 +17,5 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.example.android.camera2video.SettingsActivity"/>
+        tools:context="com.vangogh.studios.golfvideocamera.SettingsActivity"/>
 </LinearLayout>
