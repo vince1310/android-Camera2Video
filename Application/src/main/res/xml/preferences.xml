@@ -38,7 +38,7 @@
             android:title="@string/opt_fixed_val_title"
             android:summary="@string/opt_fixed_val_des"
             preference:maxValue="60"
-            preference:minValue="5"
+            preference:minValue="3"
             preference:wrapSelectorWheel="false"
             android:dependency="option_fixed"/>
     </PreferenceCategory>
